@@ -48,6 +48,7 @@ Software Engineering - Tutorial
 - CLI (https://git-scm.com/downloads)
 - GitHub (https://github.com)
 - Git Tutorial (https://www.atlassian.com/git/tutorials)
+- Tutorials Slides and Material: https://github.com/antbucc/IS-22_23/
 
 
 ---
