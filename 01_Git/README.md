@@ -19,7 +19,10 @@ Software Engineering - Tutorial
 
 ---
 
-# Tutorial Lectures of this course
+# Tutorial Lectures of this course [*]
+
+
+
 - Git - Versioning and collaboration with Git and Github
 - Database: MongoDB - Mongoose
 - Backend: JavaScript- WebAPI - NodeJS - Express - apiary.io (WebAPIs documentation)
@@ -27,6 +30,8 @@ Software Engineering - Tutorial
 - Agile and DevOps: Kanban
 - Testing - Jest
 - CI/CD - Heroku
+
+[*]: Thanks to Marco Robol @Unitn for some of the material used during these tutorials.
 
 ---
 
@@ -43,6 +48,7 @@ Software Engineering - Tutorial
 - CLI (https://git-scm.com/downloads)
 - GitHub (https://github.com)
 - Git Tutorial (https://www.atlassian.com/git/tutorials)
+
 
 ---
 
@@ -217,6 +223,8 @@ are NOT staged for commit. If you commit now, nothing will be committed.
 In git, a ​**branch**​ is a *pointer to a commit*, and it has a readable name. When you start a git repo, git creates a *default branch called ​master*. ​Git also has a **pointer called HEAD**, which *points to the current version of commit*. Initially HEAD points to master.
 
 When you commit, git not only creates a new commit but advances the branch pointer to point to the new commit. So, after a commit on the master branch, git advances the master pointer to the new commit, while HEAD keeps pointing to master.
+
+![w:600](head.png)
 
 ---
 
@@ -526,6 +534,8 @@ git log --oneline
 ---
 
 # Git Workflows
+> https://about.gitlab.com/topics/version-control/what-is-git-workflow/
+
 
 ---
 
@@ -589,3 +599,4 @@ It's important to note that "forked" repositories and "forking" are not special 
 # Questions?
 
 bucchiarone@fbk.eu
+
