@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+    <h2>Creating an Object from a JSON String</h2>
+
+    <p id="demo1"></p>
+
+    <p id="demo2"></p>
+
+    <script>
+        const txt = '{"name":"John", "age":30, "city":"New York"}'
+        const obj = JSON.parse(txt);
+        document.getElementById("demo1").innerHTML = obj.name + ", " + obj.age + " - " + obj.city;
+
+        const text = '[ "Ford", "BMW", "Audi", "Fiat" ]';
+        const myArr = JSON.parse(text);
+        document.getElementById("demo2").innerHTML = myArr[0];
+    </script>
+
+</body>
+
+</html>
