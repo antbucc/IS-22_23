@@ -9,14 +9,18 @@
 
     <p id="demo2"></p>
 
+
+
+
     <script>
-        const txt = '{"name":"John", "age":30, "city":"New York"}'
+        const txt = '{"name":"Pippo", "age":31, "city":"New York"}'
         const obj = JSON.parse(txt);
         document.getElementById("demo1").innerHTML = obj.name + ", " + obj.age + " - " + obj.city;
 
         const text = '[ "Ford", "BMW", "Audi", "Fiat" ]';
         const myArr = JSON.parse(text);
         document.getElementById("demo2").innerHTML = myArr[0];
+
     </script>
 
 </body>
