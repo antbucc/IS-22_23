@@ -36,45 +36,46 @@ user.save(function (err) {
 
 
 // inserting large batches of documents
-/*userModel.insertMany(
+userModel.insertMany(
     [
         { name: 'mario rossi', age: 40 },
-        { name: 'paolo neri', age: 25 }],
+        { name: 'paolo neri', age: 25 }
+    ],
     function (err) {
         console.log("array of users added");
     });
-*/
+
 
 // deleted at most one student document
 
-/*userModel.deleteOne({ name: 'Antonio Bucchiarone' }, function (err) {
+userModel.deleteOne({ name: 'Antonio Bucchiarone' }, function (err) {
     if (err) return handleError(err);
     // deleted at most one tank document
     console.log("element deleted");
 });
 
-*/
+
 // removing all documents matching the given filter.
 
-/*userModel.deleteMany({ name: 'Antonio Bucchiarone' }, function (err) {
+userModel.deleteMany({ name: 'Antonio Bucchiarone' }, function (err) {
     if (err) return handleError(err);
     // deleted at most one tank document
     console.log("elements deleted");
 });
-*/
+
 // Find one user whose `name` is 'Antonio Bucchiarone', otherwise `null`
-/*userModel.findOne({ name: 'mario rossi' }, function (err, user) {
+userModel.findOne({ name: 'mario rossi' }, function (err, user) {
     console.log("age: " + user.age);
 });
 
-*/
+
 const Character = mongoose.model('Character', mongoose.Schema({
     name: String,
     age: Number,
     rank: String
 }));
 
-/*
+
 Character.create([
     { name: 'Jean-Luc Picard', age: 59, rank: 'Captain' },
     { name: 'William Riker', age: 29, rank: 'Commander' },
@@ -84,21 +85,21 @@ Character.create([
 ]);
 
 const docs = Character.find({ rank: 'Lieutenant' });
-*/
+
 
 // MongoDB may return the docs in any order unless you explicitly sort
-/*Character.find({}).sort('age').
+Character.find({}).sort('age').
     exec(function (err, docs) {
         console.log(docs);
     });
-    */
 
-/*Character.find({ rank: 'Lieutenant' }).exec(function (err, docs) {
+
+Character.find({ rank: 'Lieutenant' }).exec(function (err, docs) {
     console.log("documenti trovati: " + docs.length);
 });
-*/
 
-/*Character.find({ age: 29 }).exec(function (err, docs) {
+
+Character.find({ age: 29 }).exec(function (err, docs) {
     console.log("documenti trovati: " + docs.length);
 });
-*/
+
