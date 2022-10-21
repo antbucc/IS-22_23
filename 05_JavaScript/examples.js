@@ -65,7 +65,7 @@ console.log(car.description());
 
 */
 
-
+/*
 class Car3 {
     constructor(type, model, color) {
         this.type = type;
@@ -90,3 +90,4 @@ class Suv extends Car3 {
 var NissanQuashqai = new Suv('Nissan', 'Quashqai', 'black');
 console.log(NissanQuashqai);
 console.log(NissanQuashqai.description());
+*/

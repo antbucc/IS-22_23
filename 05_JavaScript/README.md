@@ -422,7 +422,7 @@ undefined       // this is the returned value from console.log()
 Often you need to access to command line parameters. For example, 
 
 ```shell
-$ node evennumbers.js <from> <to>
+$ node examples2.js <from> <to>
 ```
 
 In node.js you do this by accessing *process*, which is a global variable containing informationan about the current node.js process. For example:
@@ -452,7 +452,7 @@ console.log(data);
 Now try running the code
 
 ```shell
-node files.js path/to/file
+node examples2.js path/to/file
 ```
 
 There are two things to highlight in the above code.
@@ -488,7 +488,7 @@ Why do you think this un undesired feature. Can you think of any instances where
 ---
 
 ### Non-blocking calls
-Let's try now an alternative implementation of our files script, the *files-async.js*.
+Let's try now an alternative implementation of our files script.
 
 ```javascript
 // Loading the file system library
