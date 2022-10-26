@@ -9,6 +9,7 @@ for (var i = 0; i < process.argv.length; i++) {
 var fs = require("fs");
 // File name from the common line params
 var fileName = process.argv[2];
+console.log(fileName);
 // Accessing the content of the file synchnously  
 var data = fs.readFileSync(fileName, "utf8");
 console.log(data);
@@ -36,3 +37,4 @@ fs.readFile(fileName, "utf8", function (error, data) {
 });
 
 console.log("Program ended.");
+

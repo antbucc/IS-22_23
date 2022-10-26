@@ -4,7 +4,7 @@ function myF() { const me = 'me'; }
 console.log(me)
 */
 
-/*
+
 const year = 2023;
 if (year > 2022) {
     const me = 'me';
@@ -12,7 +12,7 @@ if (year > 2022) {
     console.log(you);
     console.log(me);
 }
-*/
+
 
 /*
 var myvar;
@@ -49,7 +49,7 @@ console.log(result);
 
 */
 
-/*
+
 var car = {
     type: 'Fiat',
     model: '500',
@@ -63,9 +63,9 @@ var car = {
 console.log(car);
 console.log(car.description());
 
-*/
 
-/*
+
+
 class Car3 {
     constructor(type, model, color) {
         this.type = type;
@@ -81,7 +81,7 @@ console.log(fiatPuntobianca);
 console.log(fiatPuntobianca.description());
 
 
-
+/*
 class Suv extends Car3 {
     description() {
         return this.color + ", " + this.model + ", " + this.type + ", SUV";
