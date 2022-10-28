@@ -9,7 +9,7 @@ header: '06 - WebAPIs'
 footer: 'Antonio Bucchiarone - Trento, 28 Ottobre 2022 - Software Engineering'
 ---
 
-# **WebAPIs with Express (Node.js) and apiary.io**
+# **WebAPIs with Express (Node.js) and Project Structure**
 
 Software Engineering - Tutorial
 
