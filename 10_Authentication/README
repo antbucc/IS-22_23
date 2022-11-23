@@ -1,0 +1,365 @@
+---
+theme: default
+_class: lead
+paginate: true
+backgroundColor: #fff
+marp: true
+backgroundImage: url('https://marp.app/assets/hero-background.svg')
+header: '10 - Authentication'
+footer: 'Antonio Bucchiarone - Trento, 25 Novembre 2022 - Software Engineering'
+---
+
+# **Authentication**
+
+Software Engineering, Tutorial
+
+#### Antonio Bucchiarone - bucchiarone@fbk.eu
+
+*Academic year 2022/2023 - First semester*
+
+---
+
+# Contents of today class
+
+- Token-based RESTful access control
+- Implementation in EasyLib
+- Towards the Frontend
+
+---
+
+# Interactions with REST APIs are stateless!
+
+Stateless interaction means: **no sessions**! To implement access control, we should rely on a different mechanism, such as, **token-based access**.
+
+- **Authentication** - **Who** you are
+
+- **Authorization** - **What** you can do
+
+> https://blog.restcase.com/4-most-used-rest-api-authentication-methods/
+
+---
+
+# JSON Web Tokens - jwt.io
+
+#### Authenticate and get a new token
+
+Send a `POST` request to `/api/authenticate` with `{name: 'admin', password: '123'}` encoded as `x-www-form-urlencoded`. 
+
+#### Send the token to get authorized
+
+- Send the token in the **HEADER** parameter `x-access-token`
+- You can also send the token as a **URL** parameter: `/api/users?token=YOUR_TOKEN`
+- Or you can send the token as a **POST** parameter `token`
+
+Test this with EasyLib on `GET /api/users`!
+
+---
+
+# Implementation in EasyLib
+
+Install JWT module for Node.js `$ npm install jsonwebtoken`
+> https://github.com/auth0/node-jsonwebtoken
+
+---
+
+# Authenticate user and generate a new token
+
+`\app\authentication.js` 
+
+```javascript
+router.post('', async function(req, res) {
+  let user = await Student.findOne({ email: req.body.email }).exec()
+
+  if (!user)                            res.json({success:false,message:'User not found'})
+  if (user.password!=req.body.password) res.json({success:false,message:'Wrong password'})
+
+  // user authenticated -> create a token
+  var payload = { email: user.email, id: user._id, other_data: encrypted_in_the_token }
+  var options = { expiresIn: 86400 } // expires in 24 hours
+  var token = jwt.sign(payload, process.env.SUPER_SECRET, options);
+
+  res.json({ success: true, message: 'Enjoy your token!',
+    token: token, email: user.email, id: user._id, self: "api/v1/" + user._id
+  });
+});
+```
+
+```javascript
+app.use('/api/v1/authentications', authentication);
+```
+
+---
+
+# Token encoding `process.env.SUPER_SECRET`
+
+```javascript
+var token = jwt.sign(payload, process.env.SUPER_SECRET, options);
+```
+  
+`process.env.SUPER_SECRET` is defined in `.env` config file
+```javascript
+module.exports = {SUPER_SECRET: 'is2laboratory2022'} // .env file
+```
+
+Values defined in `.env` are loaded by *dotenv* into `process.env.*`
+
+- `require('dotenv').config()` load within the code
+- `node -r dotenv/config your_script.js` -r flag can be used to preload dotenv
+- `npm run start_local` (see script defined in package.json)
+
+---
+
+# Protecting routes in Express with Middlewares
+
+Require authentication only on specified routes
+```javascript
+app.use('/api/v1/students/me', tokenChecker);  // token validation middleware
+app.use('/api/v1/booklendings', tokenChecker); // token validation middleware
+// after tokenChecker apply resource routing
+app.use('/api/v1/booklendings', booklendings); // resource router middleware
+```
+
+Position of token validation middleware is important!
+```javascript
+// Non-protected routes e.g.
+app.use('/api/v1/authentications', authentication);
+app.use('/api/v1/books', books);
+
+app.use(tokenChecker); // Token validation middleware; Applies on every routes after this point
+// Protected routes e.g.
+app.use('/api/v1/booklendings', booklendings);
+```
+---
+
+## Token validation middleware `\app\tokenChecker.js`
+
+If token is validated, request is authorized.
+
+```javascript
+const tokenChecker = function(req, res, next) {
+  // header or url parameters or post parameters
+  var token = req.body.token || req.query.token || req.headers['x-access-token'];
+
+  if (!token) res.status(401).json({success:false,message:'No token provided.'})
+
+  // decode token, verifies secret and checks expiration
+  jwt.verify(token, process.env.SUPER_SECRET, function(err, decoded) {
+    if (err) res.status(403).json({success:false,message:'Token not valid'})
+    else {
+      // if everything is good, save in req object for use in other routes
+      req.loggedUser = decoded;
+      next();
+    }
+  });
+};
+```
+
+---
+
+
+- Basic frontend with HTML, fetch() API, DOM manipulation
+
+---
+
+# Basic frontend technologies
+
+> Fetch API  - scotch.io/tutorials/how-to-use-the-javascript-fetch-api-to-get-data, developers.google.com/web/updates/2015/03/introduction-to-fetch
+> Fetch vs XMLHttpRequest - www.sitepoint.com/xmlhttprequest-vs-the-fetch-api-whats-best-for-ajax-in-2019
+
+> DOM manipulation - www.w3schools.com/js/js_htmldom.asp, developer.mozilla.org/en-US/docs/Learn/JavaScript/Client-side_web_APIs/Manipulating_documents
+
+> Responsive UI with Bootstrap - getbootstrap.com
+
+---
+
+# EasyLib basic frontend
+
+
+Nel progetto EasyLib trovate una semplice web app implementata in html + javascript.
+Le chiamate asincrone al backend sono effettuate manualmente tramite il metodo fetch(), mentre la pagina html è aggionata lavorando direttamente sul **DOM** della pagina html.  
+
+EasyLib basic frontend is composed by `EasyLib\static\index.html` and `EasyLib\static\script.js`. Let's run the server and check out the frontend
+
+#### Una pagina html + javascript è la UI minima richiesta per il progetto!
+
+---
+
+## Basic frontend - HTML
+
+```html
+<h1>EasyLib</h1>
+
+<form action="api/v1/students" method="post" name="loginform" id="loginform">
+  <span>Logged User:</span> <span id="loggedUser"></span>
+  <input name="email" value="mario.rossi@unitn.com" id="loginEmail"/>
+  <input name="email" value="123" id="loginPassword"/>
+  <button type="button" onclick="login()">LogIn</button>
+</form>
+
+<h2>Books:</h2> <ul id="books"></ul>
+
+<h2>Insert new book:</h2>
+<form action="api/v1/books" method="post" name="bookform" id="bookform">
+  <input name="title" value="title" id="bookTitle"/>
+  <button type="button" onclick="insertBook()">Insert new book</button>
+</form>
+
+<script src="script.js"></script> 
+```
+
+---
+
+## Basic frontend - Javascript 1/2
+
+`EasyLib\static\script.js`
+
+```javascript
+var loggedUser = {} // This variable stores the logged in user
+
+//This function is called when login button is pressed.
+function login() { ... }
+// This function refresh the list of books
+function loadBooks() { ... }
+loadBooks();
+// This function is called by the Take button beside each book.
+function takeBook(bookUrl) { ... }
+// This function refresh the list of bookLendings.
+function loadLendings() { ... }
+// This function is called by clicking on the "insert book" button.
+function insertBook() { ...}
+```
+
+---
+
+## Basic frontend - Javascript 2/2
+
+```javascript
+function login() {
+  var email = document.getElementById("loginEmail").value;
+  var password = document.getElementById("loginPassword").value;
+
+  fetch('../api/v1/authentications', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify( { email: email, password: password } ),
+  }).then((resp) => resp.json()) // Transform the data into json
+
+  .then(function(data) { // Here you get the data to modify as you please
+    loggedUser.token = data.token;
+    loggedUser.email = data.email;
+    loggedUser.id = data.id;
+    loggedUser.self = data.self;
+    document.getElementById("loggedUser").innerHTML = loggedUser.email;
+    loadLendings();
+    return;
+  }).catch( error => console.error(error) );
+};
+```
+
+
+
+---
+# DOM Manipulation
+> The HTML DOM model is constructed as a tree of Objects:
+
+![w:900](dom.gif)
+
+
+---
+
+- With the object model, JavaScript gets all the power it needs to create dynamic HTML:
+
+  - JavaScript can change all the HTML elements in the page
+  - JavaScript can change all the HTML attributes in the page
+  - JavaScript can change all the CSS styles in the page
+  - JavaScript can remove existing HTML elements and attributes
+  - JavaScript can add new HTML elements and attributes
+  - JavaScript can react to all existing HTML events in the page
+  - JavaScript can create new HTML events in the page
+
+---
+
+> changes the content (the innerHTML) of the <p> element with id="demo":
+
+```html
+<html>
+<body>
+
+<p id="demo"></p>
+
+<script>
+document.getElementById("demo").innerHTML = "Hello World!";
+</script>
+
+</body>
+</html>
+```
+
+--- 
+> Finding HTML Element by Id
+
+```javascript
+const element = document.getElementById("intro");
+```
+
+> Finding HTML Elements by Tag Name
+
+```javascript
+const element = document.getElementsByTagName("p");
+```
+--- 
+
+# Example 
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1 id="id01">Old Heading</h1>
+
+<script>
+const element = document.getElementById("id01");
+element.innerHTML = "New Heading";
+</script>
+
+<p>JavaScript changed "Old Heading" to "New Heading".</p>
+
+</body>
+</html> 
+
+```
+--- 
+
+# Forms
+```html
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+function validateForm() {
+  let x = document.forms["myForm"]["fname"].value;
+  if (x == "") {
+    alert("Name must be filled out");
+    return false;
+  }
+}
+</script>
+</head>
+<body>
+
+<h2>JavaScript Validation</h2>
+
+<form name="myForm" action="/action_page.php" onsubmit="return validateForm()" method="post">
+  Name: <input type="text" name="fname">
+  <input type="submit" value="Submit">
+</form>
+
+</body>
+</html>
+```
+---
+
+# Questions?
+
+bucchiarone@fbk.eu

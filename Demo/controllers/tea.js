@@ -3,6 +3,7 @@ const Tea = require('../models/tea');
 //POST tea
 const newTea = (req, res) => {
     //check if the tea name already exists in db
+    console.log("qui");
     Tea.findOne({ name: req.body.name }, (err, data) => {
 
         //if tea not in db, add it
@@ -54,6 +55,7 @@ const deleteAllTea = (req, res) => {
 
 const getOneTea = (req, res) => {
     let name = req.params.name; //get the tea name
+    console.log(name);
 
     //find the specific tea with that name
     Tea.findOne({ name: name }, (err, data) => {
@@ -72,7 +74,7 @@ const deleteOneTea = (req, res, next) => {
     let teaName = req.params.name;
     var query = { name: teaName };
 
-    const result = Tea.deleteOne(query);
+    //const result = Tea.deleteOne(query);
     Tea.deleteOne(query, (err, collection) => {
         if (err) {
             throw err;

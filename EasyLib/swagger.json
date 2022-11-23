@@ -1,0 +1,59 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "EasyLib APIs",
+        "description": "EasyLib Project Application API",
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        }
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "tags": [
+        {
+            "name": "Books",
+            "description": "API for books in the system"
+        }
+    ],
+    "schemes": [
+        "http"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/api/v1/books": {
+            "get": {
+                "tags": [
+                    "Books"
+                ],
+                "summary": "Get all books in system",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Books"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Books": {
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "title": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
