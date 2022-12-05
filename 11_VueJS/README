@@ -1,0 +1,384 @@
+---
+theme: default
+_class: lead
+paginate: true
+backgroundColor: #fff
+marp: true
+backgroundImage: url('https://marp.app/assets/hero-background.svg')
+header: '11 - Frontend in VueJS'
+footer: 'Antonio Bucchiarone - 30 November 2022 - Software Engineering'
+---
+
+# **Frontend**
+
+Software Engineering, Tutorial
+
+#### Antonio Bucchiarone - bucchiarone@fbk.eu
+
+*Academic year 2022/2023 - First semester*
+
+
+
+---
+
+# Vue.js
+
+> Vue (pronounced /vjuː/, like view) is a JavaScript framework for building user interfaces. It builds on top of standard HTML, CSS and JavaScript, and provides a declarative and component-based programming model that helps you efficiently develop user interfaces, be it simple or complex.
+> https://vuejs.org/
+
+---
+
+```javascript
+import { createApp } from 'vue'
+createApp({
+  data() { return { count: 0 } }
+}).mount('#app')
+```
+```javascript
+<div id="app">
+  <button @click="count++">
+    Count is: {{ count }}
+  </button>
+</div>
+```
+
+- **Declarative Rendering**: Vue extends standard HTML with a template syntax that allows us to declaratively describe HTML output based on JavaScript state.
+
+- **Reactivity**: Vue automatically tracks JavaScript state changes and efficiently updates the DOM when changes happen.
+
+---
+
+# Quick Start [vuejs.org/guide/quick-start](https://vuejs.org/guide/quick-start.html)
+
+***[With Build Tools](https://vuejs.org/guide/quick-start.html#with-build-tools)*** - A build setup allows us to use Vue Single-File Components (SFCs). The official Vue build setup is based on Vite, a frontend build tool.
+
+- **Online** - You can try Vue with SFCs online on [StackBlitz (vite.new/vue)](https://vite.new/vue). StackBlitz runs the Vite-based build setup directly in the browser, so it is almost identical to the local setup but doesn't require installing anything on your machine.
+
+- **Local** - `npm init vue@latest` This command will install and execute create-vue, the official Vue project scaffolding tool. `npm run dev`
+
+***[Without Build Tools](https://vuejs.org/guide/quick-start.html#without-build-tools)*** - To get started with Vue without a build step, simply copy the following code into an HTML file - vuejs.org/guide/quick-start.html#without-build-tools
+
+---
+
+## Vue 3 API Styles
+
+> Vue components can be authored in two different API styles: Options API and Composition API - vuejs.org/guide/introduction.html#api-styles
+
+With **Options API**, we define a component's logic using an object of options.
+
+```html
+<script>
+export default {
+  data() { return { count: 0 } },
+  methods: {} ...
+```
+
+With **Composition API**, we define a component's logic using imported API functions.
+
+```html
+<script setup>
+import { ref, onMounted } from 'vue'
+const count = ref(0) // reactive state
+function increment() { count.value++ } ...
+```
+
+---
+
+## vuejs.org/guide/quick-start#next-steps
+
+- [Continue the Guide](https://vuejs.org/guide/essentials/application.html) - The guide walks you through every aspect of the framework. 
+
+- [Try the Tutorial](https://vuejs.org/tutorial/) - For those who prefer learning things hands-on.
+
+- [Check out the Examples](https://vuejs.org/examples/) - Explore examples of core features and common UI tasks.
+
+### Let's check out the tutorial
+https://vuejs.org/tutorial/
+
+---
+
+## Creation with build tools - vuejs.org/guide/quick-start.html#local
+
+Clone EasyLibVue, or start from scratch, `npm init vue@latest` to execute create-vue.
+
+To run: `npm install` and `npm run dev`. Application will be server on port 3030.
+
+Because our frontend origin resolves to a different domain with respect to where or APIs are exposed (port 8080), we won't be able to make asynchronous requests from the browser to our APIs server, because of the Cross-Origin policy of browser!
+
+---
+
+## CORS and Preflight request
+
+> Cross-Origin Resource Sharing (CORS) is an HTTP-header based mechanism that allows a server to indicate any origins (domain, scheme, or port) other than its own from which a browser should permit loading resources.
+https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+
+> CORS also relies on a mechanism by which browsers make a "preflight" request to the server hosting the cross-origin resource, in order to check that the server will permit the actual request. In that preflight, the browser sends headers that indicate the HTTP method and headers that will be used in the actual request.
+https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request
+
+> Tutorial - https://web.dev/cross-origin-resource-sharing/
+
+---
+
+### Supporting CORS in Node.js `EasyLib\app\app.js`
+
+```javascript
+app.use(function (req, res, next) { // Add headers before the routes are defined
+    // Website you wish to allow to connect
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    // Request methods you wish to allow
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    // Request headers you wish to allow
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    // Set to true if you need the website to include cookies in the requests sent
+    // to the API (e.g. in case you use sessions)
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    // Pass to next layer of middleware
+    next();
+});
+```
+
+#### Using a module https://expressjs.com/en/resources/middleware/cors.html
+
+```javascript
+const cors = require('cors')
+app.use(cors())
+```
+
+---
+
+## Let's go back on our EasyLib Vue frontend
+
+`EasyLibVue\src\App.vue`
+
+```html
+import Login from '@/components/Login.vue'
+...
+<nav>
+  ...
+  <RouterLink to="/books">Books</RouterLink>
+  <RouterLink to="/booklendings">Booklendings</RouterLink>
+</nav>
+<Login />
+...
+```
+
+---
+
+## `EasyLibVue\src\components\Login.vue`
+
+```html
+<script setup>
+import { ref } from 'vue'
+import { loggedUser, setLoggedUser, clearLoggedUser } from '../states/loggedUser.js'
+const HOST = `http://localhost:8080`;
+const email = ref('mario.rossi@unitn.com');
+const password = ref('123')
+function login() {
+    fetch(HOST+'/api/v1'+'/authentications', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify( { email: email.value, password: password.value } ),
+    })
+    .then((resp) => resp.json()) // Transform the data into json
+    .then(function(data) { setLoggedUser(data) })
+};
+function logout() { clearLoggedUser() }
+</script>
+<template>
+  <form>
+    <span v-if="loggedUser.token">
+      Welcome <a :href="HOST+'/'+loggedUser.self">{{loggedUser.email}}</a>
+      <button type="button" @click="logout">LogOut</button>
+    </span>
+    <span v-if="!loggedUser.token">
+      <input name="email" v-model="email" />
+      <input name="password" v-model="password" />
+      <button type="button" @click="login">LogIn</button>
+    </span>
+  </form>
+</template>
+
+```
+
+---
+
+## `EasyLibVue\src\states\loggedUser.js`
+
+> https://vuejs.org/guide/scaling-up/state-management.html#simple-state-management-with-reactivity-api
+
+```javascript
+import { reactive } from 'vue'
+const loggedUser = reactive({
+    token: undefined, email: undefined,
+    id: undefined, self: undefined
+})
+
+function setLoggedUser (data) {
+    loggedUser.token = data.token; loggedUser.email = data.email;
+    loggedUser.id = data.id; loggedUser.self = data.self;
+}
+function clearLoggedUser () {
+    loggedUser.token = undefined; loggedUser.email = undefined;
+    loggedUser.id = undefined; loggedUser.self = undefined;
+}
+
+export { loggedUser, setLoggedUser, clearLoggedUser } 
+```
+
+---
+
+## `EasyLibVue\src\router\index.js`
+
+```javascript
+import HomeView from '../views/HomeView.vue'
+routes: [
+  {
+    path: '/',
+    name: 'home',
+    component: HomeView
+  },
+  {
+    path: '/books',
+    name: 'books',
+    // route level code-splitting
+    // this generates a separate chunk (About.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import('../views/BooksView.vue')
+  },
+  {
+    path: '/booklendings',
+    name: 'booklendings',
+    component: () => import('../views/BooklendingsView.vue')
+  }
+]
+```
+
+---
+
+## `EasyLibVue\src\views\BooklendingsView.vue`
+
+```html
+<script setup>
+import BooklendingsTable from '@/components/BooklendingsTable.vue'
+</script>
+
+<template>
+  <div>
+    <h1>Booklendings:</h1>
+      <BooklendingsTable />
+  </div>
+</template>
+
+<style>
+</style>
+```
+
+---
+
+## `EasyLibVue\src\components\BooklendingsTable.vue`
+
+```html
+<script setup>
+import { loggedUser } from '../states/loggedUser.js'
+import { books, fetchBooks, createBook, deleteBook } from '../states/books.js'
+
+const HOST = `http://localhost:8080`; const API_URL = HOST+`/api/v1`;
+const booklendings = ref([])
+onMounted( () => { fetchBooks(); fetchData(); })
+watch(loggedUser, (_loggedUser, _prevLoggedUser) => { fetchBooks(); fetchData(); })
+
+async function fetchData() {
+  if (!loggedUser.token) { booklendings.value = []; return; }
+  const url = API_URL+'/booklendings?studentId=' + loggedUser.id + '&token=' + loggedUser.token
+  booklendings.value = await (await fetch(url)).json()
+}
+async function deleteLending(lending) {...};
+</script>
+<template>
+  <span v-if="loggedUser.token"> Here are you booklendings, {{loggedUser.email}}: </span>
+  <span v-if="!loggedUser.token" style="color: red"> 'Please login to visualize booklendings!' </span>
+  <ul>
+    <li v-for="lending in booklendings" :key="lending.self">
+      <a :href="HOST+lending.book">{{ ( books.value.find(b=>b.self==lending.book) || {title: 'unknown'} ).title}}</a> -
+      <button @click="deleteLending(lending)">RETURN {{lending.self}}</button>
+    </li>
+  </ul>
+</template>
+```
+
+---
+
+# Questions?
+
+bucchiarone@fbk.eu
+
+---
+
+# Back up slides
+
+---
+
+## Vue.js additional pointers
+
+Qui un tutorial su come consumare servizi REST da un applicazione Vue.js: https://bezkoder.com/vue-js-crud-app/
+
+In particolare un tutorial sullo stack Vue.js + Node.js + Express + MongoDB example è presente qui: https://bezkoder.com/vue-node-express-mongodb-mevn-crud/
+
+Autenticazione con JWT: https://bezkoder.com/jwt-vue-vuex-authentication/
+
+---
+
+# Build and serve Vue app from our backend
+
+When ready to ship app to production, run the following: `npm run build`. This generates minified html+javascript frontend in `.\dist` folder. We can then serve the frontend on a dedicated server or on our API server.
+
+```javascript
+// Serving frontend files from process.env.FRONTEND
+app.use('/', express.static(process.env.FRONTEND || 'static'));
+// If request not handled, try in ./static
+app.use('/', express.static('static'));
+// If request not handled, try with next middlewares ...
+```
+`EasyLib\app\app.js`
+
+```
+# Path to external frontend - If not provided, basic frontend in static/index.html is used
+FRONTEND='../EasyLibVue/dist'
+```
+`EasyLib\.env`
+
+---
+
+- Serving over HTTP using ES modules syntax
+
+```html
+<script type="importmap">
+  {
+    "imports": {
+      "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
+    }
+  }
+</script>
+
+<div id="app">{{ message }}</div>
+
+<script type="module">
+  import { createApp } from 'vue'
+
+  createApp({
+    data() {
+      return {
+        message: 'Hello Vue!'
+      }
+    }
+  }).mount('#app')
+</script>
+```
+
+---
+
+# Vuetify - Material Design Framework
+
+> Vue UI Library with beautifully handcrafted Material Components. No design skills required - everything you need to create amazing applications is at your fingertips.
+> https://vuetifyjs.com/en/
+
+Only for Vue 2.0

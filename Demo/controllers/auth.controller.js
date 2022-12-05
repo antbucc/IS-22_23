@@ -17,12 +17,14 @@ const signup = async (req, res) => {
         })
 
 
+
         // save this object to database
         newCustomer.save((err, data) => {
             if (err) return res.json({ Error: err });
             return res.json({ message: "Customer Created", data });
         })
 
+        // return res.json({ message: "Customer Created", data });
     }
     else {
         return res.json({ error: "Customer already exists" });

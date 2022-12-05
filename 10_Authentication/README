@@ -6,7 +6,7 @@ backgroundColor: #fff
 marp: true
 backgroundImage: url('https://marp.app/assets/hero-background.svg')
 header: '10 - Authentication'
-footer: 'Antonio Bucchiarone - Trento, 25 Novembre 2022 - Software Engineering'
+footer: 'Antonio Bucchiarone - Trento, 28 Novembre 2022 - Software Engineering'
 ---
 
 # **Authentication**

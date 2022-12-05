@@ -1,0 +1,184 @@
+---
+theme: default
+_class: lead
+paginate: true
+backgroundColor: #fff
+marp: true
+backgroundImage: url('https://marp.app/assets/hero-background.svg')
+header: '12 - Deployment - Continuous Integration'
+footer: 'Antonio Bucchiarone - Trento, 01 December 2022 - Software Engineering'
+---
+
+# **Deployment - Continuous Integration**
+
+Software Engineering, Tutorial
+
+#### Antonio Bucchiarone - bucchiarone@fbk.eu
+
+*Academic year 2022/2023 - First semester*
+
+
+---
+
+# Heroku
+
+**Cloud Application Platform** - Heroku is a platform as a service (PaaS) that enables developers to build, run, and operate applications entirely in the cloud - heroku.com
+
+---
+
+## Setup Heroku CLI on your your machine
+
+https://devcenter.heroku.com/articles/getting-started-with-nodejs?singlepage=true
+
+1. Register on https://www.heroku.com/
+
+1. Install Heroku CLI https://devcenter.heroku.com/articles/heroku-cli
+
+1. CLI log in `heroku login`
+
+---
+
+## Prepare the application
+
+https://devcenter.heroku.com/articles/preparing-a-codebase-for-heroku-deployment#
+
+1. Create *Procfile* `.\Procfile`:
+
+    https://devcenter.heroku.com/articles/preparing-a-codebase-for-heroku-deployment#3-add-a-procfile
+
+    ```yaml
+    web: node index.js
+    test: jest
+    ```
+
+1. Set listening port of Node server:
+
+    https://devcenter.heroku.com/articles/preparing-a-codebase-for-heroku-deployment#4-listen-on-the-correct-port
+
+    ```javascript
+    const PORT = process.env.PORT || 8080
+    ```
+
+---
+
+## Create heroku app and connect with local repository.
+
+https://devcenter.heroku.com/articles/git#creating-a-heroku-remote
+
+1. **Create a new Heroku app** from your existing repository `heroku create`
+  
+    Alternatively, create a new app from the Heroku Dashboard and manually add remote source to your local repository `heroku git:remote -a our-heroku-app`
+
+1. **Configure env vars** from *Setting*->*Config Vars* e.g. DB_URL and SUPER_SECRET
+
+1. **Push** repository on *heroku* remote source `git push heroku main`
+
+1. **Start the Heroku app** `heroku ps:scale web=1` and open it `heroku open` or view logs `heroku logs --tail`
+
+You can also run the Heroku app locally through the Procfile `heroku local web`
+
+---
+
+# Travis CI
+
+> The simplest way to test and deploy your projects in the cloud. Easily sync your projects with Travis CI and you’ll be testing your code in minutes - travis-ci.org
+
+---
+
+## Configure repository to use Travis CI
+
+> https://docs.travis-ci.com/user/tutorial/#to-get-started-with-travis-ci-using-github
+
+- Create file `.travis.yml`:
+
+```yaml
+language: node_js
+```
+
+- On Travis CI Dashboard add your repository
+
+- Check build status of your application
+
+- Click on "Build status image" [![Build Status](https://travis-ci.org/unitn-software-engineering/EasyLib.svg?branch=master)](https://travis-ci.org/unitn-software-engineering/EasyLib) to get the markdown code
+
+- Embed "Build status image" [![Build Status](https://travis-ci.org/unitn-software-engineering/EasyLib.svg?branch=master)](https://travis-ci.org/unitn-software-engineering/EasyLib) in your `readme.MD`
+
+> https://travis-ci.org/github/unitn-software-engineering/EasyLib [![Build Status](https://travis-ci.org/unitn-software-engineering/EasyLib.svg?branch=master)](https://travis-ci.org/unitn-software-engineering/EasyLib)
+
+---
+
+## `.gitignore` - Ignoring files from git versioning
+
+- You can start from generic `.gitignore` file generated on www.gitignore.io, such as, https://www.gitignore.io/api/node,windows,linux,visualstudiocode
+
+- **Make sure to always ingore**: `node_modules` `coverage` `.env`
+
+- Put the `.gitignore` file itself under version control `git add .gitignore`
+
+---
+
+## Automatically deploy your Heroku application
+
+- Deploy automatically on Heroku after a successful build by Travis CI:
+
+    https://docs.travis-ci.com/user/deployment/heroku/
+
+    `.travis.yml`:
+    ```yaml
+    deploy:
+      provider: heroku
+      api_key:
+        secure: "YOUR ENCRYPTED API KEY"
+    ```
+
+- Alternatively, auto-deployment from GitHub can be configured on Heroku Dashboard:
+
+    https://devcenter.heroku.com/articles/github-integration
+
+---
+
+
+## Frontend already in the same repository as your webAPIs
+
+`EasyLib\app\app.js`
+```javascript
+// Serving frontend files from process.env.FRONTEND
+app.use('/', express.static(process.env.FRONTEND || 'static'));
+// If request not handled, try in ./static
+app.use('/', express.static('static'));
+// If request not handled, try with next middlewares ...
+```
+
+`EasyLib\.env` These configurations are used only locally, never commit these settings!
+```yaml
+# Path to external frontend - If not provided, basic frontend in static/index.html is used
+FRONTEND='../EasyLibVue/dist'
+```
+
+Separately setup Heroku with appropriate environment variables!
+
+---
+
+## Build and serve Vue app on *GitHubPages* pages.github.com
+
+When ready to ship app to production, run the following: `npm run build`. This generates minified html+javascript frontend in `.\dist` folder. Create a **dedicated repository for hosting** on github to host your frontend, then push your built frontend manually or with a script `EasyLibVue\deploy.sh`: 
+
+```bash
+npm run build # build Vue app
+cd dist # navigate into the build output directory
+git init
+git add -A
+git commit -m 'deploy'
+git push -f https://github.com/unitn-software-engineering/EasyLibApp.git master:gh-pages
+```
+
+***MUST be a repository dedicated to hosting, different from your Frontend repository!***
+Run `.\deploy.sh` (In case of errors, manually delete the folder `.\dist`).
+
+> https://cli.vuejs.org/guide/deployment.html#github-pages
+
+---
+
+# Questions?
+
+bucchiarone@fbk.eu
