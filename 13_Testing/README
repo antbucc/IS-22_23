@@ -1,0 +1,444 @@
+---
+theme: default
+_class: lead
+paginate: true
+backgroundColor: #fff
+marp: true
+backgroundImage: url('https://marp.app/assets/hero-background.svg')
+header: '13 - Testing'
+footer: 'Antonio Bucchiarone - Trento, 06 December 2022 - Software Engineering'
+---
+
+# **Testing**
+
+Software Engineering, Tutorial
+
+#### Antonio Bucchiarone - bucchiarone@fbk.eu
+
+*Academic year 2022/2023 - First Semester*
+
+---
+
+# Create a Gitignore File
+
+
+> To create a Gitignore file, create a new file and name it “.gitignore” (with a dot at the start and all lowercase) in the top level of your Git repo
+
+> Git automatically searches for a “.gitignore” file so all you need to do is create it (you don’t need to run any special commands or turn on any option in order to be able to use it)
+
+> Each line in a gitignore file specifies a pattern. 
+
+--- 
+- Open the file in a plaintext editor and add the files, folders and file types that you want Git to **ignore**:
+
+1. Adding **filename.txt** will cause all files with that exact name to be ignored
+2. Adding **foldername/** will cause all folders with that exact name to be ignored (including any and all files and sub-folders inside of them).
+3. Asterisks can be used as wildcards: *.docx will cause all files that end with that extension to be ignored.
+4. Comments can be added with hashes # Like this
+
+
+---
+
+# ignore the .env file
+
+> The best solution is to put the **.env** file in it's own folder, then add that folder to the .gitignore file. example:
+
+1. create a folder called "vars"
+2. move your .env file into that folder
+3. add the vars folder in .gitignore
+
+```javascript
+
+/node_modules
+/vars
+
+```
+
+---
+
+> There are many types of testing and soon you'll be overwhelmed by the terminology, but long story short tests fall into three main categories:
+
+- unit testing
+- integration testing
+- UI testing
+
+> we'll cover only **unit testing** for the purpose of **D4**.
+
+
+---
+
+# Testing with Jest
+
+- Jest is a JavaScript Testing Framework with a focus on simplicity - jestjs.io
+
+- Jest is a testing framework for JavaScript that includes both a **test-runner** and **assertion** functions in one package.
+
+---
+
+# what is Jest?
+ > Jest is a JavaScript test runner, that is, a **JavaScript library** for *creating*, *running*, and *structuring* tests.
+
+> Jest ships as an NPM package, you can install it in any JavaScript project. 
+> Jest is one of the most popular test runner these days, and the default choice for **React** projects.
+
+---
+# How do I know what to test?
+
+- If you're writing a **web application** a good starting point would be testing **every page of the app** and every **user interaction**. 
+- But, web applications are also made of units of code like **functions** and **modules** that need to be tested too.
+
+---
+
+# Testing Flow
+
+ > Here's how a typical test flow looks like:
+
+ 1. import the function to test
+ 2. give an input to the function
+ 3. define what to expect as the output
+ 4. check if the function produces the expected output
+
+ > input - expected output - assert the result
+
+---
+
+# Configure Jest
+
+- To configure Jest to run tests with the **npm test** command, the **package.json** file must have the "test" script defined.
+
+```javascript
+{
+    "scripts": {
+        "test": "jest  --coverage"
+    }
+}
+ ```
+
+> The provided configuration will run the jest command on all files with the extension .test.js
+> The --coverage flag will produce a coverage report in the output 
+
+---
+# Test structure, and a first failing test
+
+ - Time to create your first Jest test. Open up **filterByTerm.spec.js** and create a test block:
+```javascript
+describe("Filter function", () => {
+  // test stuff
+});
+```
+- **describe**, a Jest method for containing one or more related tests. 
+- Every time you start writing a new **suite of tests** for a functionality wrap it in a describe block. 
+- it takes two arguments: a **string** for describing the **test suite**, and a **callback function** for wrapping the **actual test**.
+---
+
+# The test() method in Jest
+
+> Every Jest test begins with the **test()** function, which accepts two required arguments and one optional argument:
+
+ - A string describing the functionality being tested
+ - A callback function containing the testing logic to execute
+ - An optional timeout value in milliseconds. 
+ - The Jest test must wait for this timeout to complete before completing the test
+
+```javascript
+test('test description', () => {
+    // testing logic and assertions go here...
+  }, timeout)
+ ```
+
+---
+
+# Test Block Example
+
+```javascript
+describe("Filter function", () => {
+  test("it should filter by a search term (link)", () => {
+    // actual test
+  });
+});
+
+ ```
+
+ ---
+> testing is a matter of **inputs**, **functions**, and **expected outputs**. First let's define a simple input, an array of objects:
+
+```javascript
+describe("Filter function", () => {
+  test("it should filter by a search term (link)", () => {
+    const input = [
+      { id: 1, url: "https://www.url1.dev" },
+      { id: 2, url: "https://www.url2.dev" },
+      { id: 3, url: "https://www.link3.dev" }
+    ];
+  });
+});
+ ```
+ ---
+
+ > Next up we're going to define the **expected result**. 
+ - As per spec the function under test should leave out the objects whose url property does not match the given search term.
+ - We can expect for example an array with a single object, given "link" as the search term:
+
+```javascript
+ describe("Filter function", () => {
+  test("it should filter by a search term (link)", () => {
+    const input = [
+      { id: 1, url: "https://www.url1.dev" },
+      { id: 2, url: "https://www.url2.dev" },
+      { id: 3, url: "https://www.link3.dev" }
+    ];
+
+    const output = [{ id: 3, url: "https://www.link3.dev" }];
+  });
+});
+ ```
+
+ ---
+
+ > Now we're ready to write the actual test. 
+ > We'll use **expect**, and a Jest matcher for checking if our fictitious (for now) function returns the expected result when called. 
+  - Here's the test:
+
+  ```javascript
+  expect(filterByTerm(input, "link")).toEqual(output);
+  ```
+ ---
+
+  ```javascript
+describe("Filter function", () => {
+  test("it should filter by a search term (link)", () => {
+    const input = [
+      { id: 1, url: "https://www.url1.dev" },
+      { id: 2, url: "https://www.url2.dev" },
+      { id: 3, url: "https://www.link3.dev" }
+    ];
+
+    const output = [{ id: 3, url: "https://www.link3.dev" }];
+
+    expect(filterByTerm(input, "link")).toEqual(output);
+
+  });
+});
+```
+ ---
+
+ > What's really missing is the **implementation of filterByTerm**. 
+ -  we're going to create the function in the same file where the test lives. 
+ - In a real project you would define the function in another file and import it from the test file.
+
+> we use a native JavaScript function called **filter** which is able to filter out elements from an array.
+ ```javascript
+function filterByTerm(inputArr, searchTerm) {
+  return inputArr.filter(function(arrayElement) {
+    return arrayElement.url.match(searchTerm);
+  });
+}
+```
+ ---
+ > for each element of the input array we check the "url" property, matching it against a regular expression with the **match method**.
+ ```javascript
+ function filterByTerm(inputArr, searchTerm) {
+  return inputArr.filter(function(arrayElement) {
+    return arrayElement.url.match(searchTerm);
+  });
+}
+
+describe("Filter function", () => {
+  test("it should filter by a search term (link)", () => {
+    const input = [
+      { id: 1, url: "https://www.url1.dev" },
+      { id: 2, url: "https://www.url2.dev" },
+      { id: 3, url: "https://www.link3.dev" }
+    ];
+
+    const output = [{ id: 3, url: "https://www.link3.dev" }];
+
+    expect(filterByTerm(input, "link")).toEqual(output);
+  });
+});
+
+ ```
+ ---
+
+ - **filterByTerm** should account also for uppercase search terms. 
+ - In other words it should return the matching objects even if the search term is an uppercase string
+ ```javascript
+ filterByTerm(inputArr, "link");
+ filterByTerm(inputArr, "LINK");
+```
+
+ - For testing this condition we introduced a new test
+  ```javascript
+    expect(filterByTerm(input, "LINK")).toEqual(output); // New test
+  ```
+ ---
+ > Rather than passing **searchTerm** straight away we can construct a **case-insensitive regular expression**, that is, an expression that matches regardless of the string's case. -  https://www.w3schools.com/jsref/jsref_regexp_i.asp - 
+
+ ```javascript
+function filterByTerm(inputArr, searchTerm) {
+  const regex = new RegExp(searchTerm, "i");
+  return inputArr.filter(function(arrayElement) {
+    return arrayElement.url.match(regex);
+  });
+}
+ ```
+ ---
+
+## Install Jest in **develompment** environment and run it
+
+1. `npm install --save-dev jest`
+2. Let's get started by writing a test for a hypothetical function that adds two numbers. First, create a **sum.js** file:
+
+```javascript
+function sum(a, b) {
+  return a + b;
+}
+module.exports = sum;
+
+ ```
+---
+
+3. Then, create a file named **sum.test.js**. This will contain our actual test:
+
+```javascript
+const sum = require('./sum');
+
+test('adds 1 + 2 to equal 3', () => {
+  expect(sum(1, 2)).toBe(3);
+});
+ ```
+
+
+---
+
+ 4. Finally, run  **npm test** and Jest will print this message:
+
+```javascript
+PASS  ./sum.test.js
+✓ adds 1 + 2 to equal 3 (5ms)
+```
+
+---
+
+
+## Testing a function *concatenateStrings(a, b)*
+
+`./someModule.js`
+```javascript
+function concatenateStrings (a, b) { return '' + a + b }
+module.exports = concatenateStrings
+```
+
+`./someModule.test.js`
+```javascript
+const conc = require('./someModule')
+test('conc 2+2', () => {
+    expect(conc(2, 2)).toBe('22');
+});
+test('concat test', () => {
+    expect(conc('a','b')).toBe('ab');
+});
+test('concat null', () => {
+    expect(conc(null,null)).toBe('nullnull');
+});
+```
+
+---
+
+# Example function to test
+```javascript
+module.exports.calculateValue = (valueA, valueB, addOffset = false, addWarning = true) => {
+  let result = {
+    value: (addOffset ? valueA + valueB + 10 : valueA + valueB),
+    message: null
+  }
+  if (result.value > 100) {
+    let messageParts = []
+    if (addWarning) messageParts.push('Warning:');
+    messageParts.push('result is greater then 100');
+    result.message = messageParts.join(' ');
+  }
+  return result;
+}
+
+```
+
+--- 
+
+> Now let’s start writing the test suite for our sample function. We start with an empty suite saved as **functions.test.js** which is simply touching the source file…
+
+```javascript
+
+const { calculateValue } = require('./function');
+
+describe('test-coverage test suite', () => {
+
+  test('tests something', () => {
+  });
+
+});
+
+```
+
+---
+# First straight-forward test 
+
+```javascript
+it('calculateValue test 1', () => {
+  expect(calculateValue(10, 20).value).toBe(30);
+});
+```
+---
+
+## Testing an API with `node-fetch`
+
+`./api.test.js`
+```javascript
+const fetch = require("node-fetch");
+const url = process.env.HEROKU || "http://localhost:3000"
+it('works with get', async () => {
+    expect.assertions(1)
+    expect( ( await fetch(url) ).status ).toEqual(200)
+})
+it('works with post', async () => {
+    expect.assertions(1)
+    var response = await fetch(url+'/courses', {
+        method: 'POST', body: JSON.stringify({name: 'hello course'}),
+        headers: { 'Content-Type': 'application/json' }
+    })
+    expect( ( await response.json() ).status ).toEqual(201)
+})
+```
+`npm install --save-dev node-fetch`: This requires the server to be running!
+
+
+---
+
+## Testing EasyLib *token-authenticated* APIs on *mongodb* 
+
+`EasyLib\app\booklendings.test.js`
+```javascript
+const request  = require('supertest');    const app      = require('./app');
+const jwt      = require('jsonwebtoken'); const mongoose = require('mongoose');
+
+describe('GET /api/v1/booklendings', () => {
+
+  beforeAll( async () => { jest.setTimeout(8000);
+    app.locals.db = await  mongoose.connect(process.env.DB_URL); });
+  afterAll( () => { mongoose.connection.close(true); });
+  
+  var token = jwt.sign( {email: 'John@mail.com'},
+    process.env.SUPER_SECRET, {expiresIn: 86400} ); // create a valid token
+  
+  test('POST /api/v1/booklendings with Student not specified', () => {
+    return request(app).post('/api/v1/booklendings')
+    .set('x-access-token', token).set('Accept', 'application/json')
+    .expect(400, { error: 'Student not specified' });
+  });
+```
+
+---
+
+# Questions?
+
+bucchiarone@fbk.eu

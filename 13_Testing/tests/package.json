@@ -1,0 +1,8 @@
+{
+    "scripts": {
+        "test": "jest  --coverage"
+    },
+    "devDependencies": {
+        "node-fetch": "^3.3.0"
+    }
+}
