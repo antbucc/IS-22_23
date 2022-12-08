@@ -38,7 +38,7 @@ describe("Filter function", () => {
 });
 */
 
-/*
+
 describe("Filter function", () => {
     test("it should filter by a search term (link)", () => {
         const input = [
@@ -51,7 +51,7 @@ describe("Filter function", () => {
 
         expect(filterByTerm(input, "link")).toEqual(output);
 
-        expect(filterByTerm(input, "LINK")).toEqual(output);
+        expect(filterByTerm(input, "Link")).toEqual(output);
     });
 });
 
@@ -61,4 +61,3 @@ function filterByTerm(inputArr, searchTerm) {
         return arrayElement.url.match(regex);
     });
 }
-*/

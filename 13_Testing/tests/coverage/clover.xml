@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1670396196604" clover="3.2.0">
-  <project timestamp="1670396196604" name="All files">
-    <metrics statements="4" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2" elements="6" coveredelements="6" complexity="0" loc="4" ncloc="4" packages="1" files="2" classes="2"/>
+<coverage generated="1670403189572" clover="3.2.0">
+  <project timestamp="1670403189572" name="All files">
+    <metrics statements="12" coveredstatements="12" conditionals="8" coveredconditionals="8" methods="3" coveredmethods="3" elements="23" coveredelements="23" complexity="0" loc="12" ncloc="12" packages="1" files="3" classes="3"/>
+    <file name="function.js" path="/Users/bucchiarone/Documents/Personali/IS-22_23/13_Testing/tests/function.js">
+      <metrics statements="8" coveredstatements="8" conditionals="8" coveredconditionals="8" methods="1" coveredmethods="1"/>
+      <line num="1" count="1" type="cond" truecount="2" falsecount="0"/>
+      <line num="2" count="4" type="stmt"/>
+      <line num="7" count="4" type="cond" truecount="2" falsecount="0"/>
+      <line num="8" count="3" type="stmt"/>
+      <line num="10" count="3" type="cond" truecount="2" falsecount="0"/>
+      <line num="11" count="3" type="stmt"/>
+      <line num="12" count="3" type="stmt"/>
+      <line num="15" count="4" type="stmt"/>
+    </file>
     <file name="someModule.js" path="/Users/bucchiarone/Documents/Personali/IS-22_23/13_Testing/tests/someModule.js">
       <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
       <line num="1" count="3" type="stmt"/>

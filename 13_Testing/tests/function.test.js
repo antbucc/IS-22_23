@@ -17,7 +17,6 @@ describe('test-coverage test suite', () => {
         expect(calculateValue(10, 20).value).toBe(30);
     });
 });
-
 */
 
 // third
@@ -33,9 +32,10 @@ describe('test-coverage test suite', () => {
 
 */
 
+
 // full example
 
-/*
+
 describe('test-coverage test suite', () => {
 
     test('calculateValue test 1', () => {
@@ -63,4 +63,3 @@ describe('test-coverage test suite', () => {
     });
 
 });
-*/
