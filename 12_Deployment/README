@@ -5,8 +5,8 @@ paginate: true
 backgroundColor: #fff
 marp: true
 backgroundImage: url('https://marp.app/assets/hero-background.svg')
-header: '12 - Deployment - Continuous Integration'
-footer: 'Antonio Bucchiarone - Trento, 01 December 2022 - Software Engineering'
+header: 'Deployment - Continuous Integration'
+footer: 'Antonio Bucchiarone - Trento, 12 December 2022 - Software Engineering'
 ---
 
 # **Deployment - Continuous Integration**
@@ -19,10 +19,267 @@ Software Engineering, Tutorial
 
 
 ---
+# API Testing
 
-# Heroku
+> To make **API requests** in our Jest tests, we require a **module** that will query our **endpoints** and return the **responses** to our tests. 
+> That module is **SuperTest**, and you can install it using this command:
 
-**Cloud Application Platform** - Heroku is a platform as a service (PaaS) that enables developers to build, run, and operate applications entirely in the cloud - heroku.com
+```javascript
+npm install  --save-dev supertest
+```
+
+---
+# Example 1
+
+- **Jest** and **SuperTest** are set up, and a basic test has been written in the Jest testing framework.  
+
+- Start with the response provided by the endpoint http://localhost:3000/space/destinations. It is a simple array of objects representing the destinations space flights will travel to.
+
+```javascript
+[
+  "Mars",
+  "Moon",
+  "Earth",
+  "Mercury",
+  "Venus",
+  "Jupiter"
+]
+```
+
+---
+# Example 1
+
+```javascript
+const request = require('supertest');
+const app = require("../app");
+
+describe('Space test suite', () => {
+    test('tests /destinations endpoints', async() => {
+        const response = await request(app).get("/space/destinations");
+        expect(response.body).toEqual(["Mars", "Moon", "Earth", "Mercury", "Venus", "Jupiter"]);
+        expect(response.body).toHaveLength(6);
+        expect(response.statusCode).toBe(200);
+        // Testing a single element in the array
+        expect(response.body).toEqual(expect.arrayContaining(['Earth']));
+
+    });
+
+    // Insert other tests below this line
+
+    // Insert other tests above this line
+});
+```
+---
+# Example 2
+
+> In this example, we will test the **/space/flights/seats** endpoint. This endpoint provides a response that is more complicated than the array one above.
+
+```javascript
+{ "starship": [
+    {
+      "firstClass": {
+        "heatedSeats": true,
+        "chairOptions": [
+          "leather",
+          "wollen"
+        ],
+        "vaultAccess": true,
+        "drinksServed": [
+          "tea",
+          "coffee",
+          "space-special",
+          "wine"
+        ],
+        "windowAccess": true,
+        "privateCabin": "2",
+        "VRAccess": "unlimited",
+        "cost": "$20000",
+        "seatHover": {
+          "cryoMode": [
+            "extreme",
+            "ludacris",
+            "plaid"
+          ],
+          "staticMode": [
+            "ludacris",
+            "plaid"
+          ]
+        }
+      },
+      "businessClass": { ... }
+    }
+  ],
+  "blueOrigin": [
+    {
+      "firstClass": { ... },
+      "businessClass": { ... }
+    }
+  ]
+
+}
+```
+---
+# Example 2
+
+```javascript
+
+    test('tests /space/flights/seats endpoint - starship', async () => {
+        const response = await request(app).get("/space/flights/seats");
+        expect(response.body.starship).toEqual(expect.arrayContaining([expect.any(Object)]));
+        // Checking that the starship Object contains firstClass Object which then contains a set of objects
+        expect(response.body.starship).toEqual(expect.arrayContaining(
+            [expect.objectContaining({ firstClass: expect.any(Object) })]));
+
+        expect(response.body.starship).toEqual(expect.arrayContaining([expect.objectContaining(
+            { businessClass: expect.any(Object) })]));
+
+        // Checking that under the bussinessClass Object we have the array drinks served
+        expect(response.body.starship)
+            .toEqual(expect.arrayContaining([expect.objectContaining({
+                businessClass: expect.objectContaining({ drinksServed: expect.any(Array) })
+            })]));
+
+        // Checking that under the firstClass: Object we have the option ludacris in the seatHover Object
+        expect(response.body.starship)
+        .toEqual(expect.arrayContaining([expect.objectContaining({
+            firstClass: expect.objectContaining({ seatHover: expect.objectContaining({
+                cryoMode : expect.arrayContaining(['ludacris'])}) })
+        })]));
+
+        // Checking that under the firstClass: Object we have the option plaid in the seatHover Object
+        expect(response.body.starship)
+        .toEqual(expect.arrayContaining([expect.objectContaining({
+            firstClass: expect.objectContaining({ seatHover: expect.objectContaining({
+                staticMode : expect.arrayContaining(['plaid'])}) })
+        })]));
+    });
+
+```
+---
+
+# CI/CD in Node.js with GitHub Actions
+
+> Continuous integration/continuous deployment is a software engineering practice that helps teams to collaborate better and improve their overall software. 
+
+> With **GitHub Actions**, you can easily integrate this into your GitHub project without using an external platform.
+
+> In this lecture, we see how you can use GitHub Actions to set up a **CI/CD pipeline** to your project.
+---
+# What is continuous integration?
+
+**Continuous integration (CI)** is the software engineering practice that requires *frequent commits* to a *shared repository*. 
+
+
+> Before CI, people would work on **feature branches** for weeks or months and then try to **merge** this branch to a **main branch**. 
+
+> Think about all that could go wrong during such merge — merge **conflicts** and **failing tests**, just to mention a few.
+
+> **Continuous integration** tries to prevent all of these by encouraging small and frequent code updates. 
+
+> When a code is committed to a repository, it can be **built** and **tested** against **setup workflows** to ensure that the code does not introduce any errors.
+
+---
+# What is continuous deployment?
+
+ - **Continuous deployment** means code changes are **automatically deployed/released** to a *testing* or *production* environment as soon as they are merged. T
+ 
+  - This is often interchanged with **continuous delivery** and that’s because they are very similar. 
+  - The only difference is that in **continuous delivery**, human intervention (e.g., the click of a button) is needed for the changes to be released. 
+  - In **continuous deployment**, everything happens automatically. For the rest of this post, we refer to CD as continuous deployment.
+
+---
+
+# Advantages of CI/CD
+Here are more advantages in addition to those already mentioned above:
+
+- **Fault isolation** is simpler and faster. Since changes are smaller, it is easier to isolate the changes that cause a bug after deployment. This makes it **easier to fix or roll back** changes if necessary.
+ - Since CI/CD encourages small, frequent changes, **code review time is shorter**.
+- A major part of the CI/CD pipeline is the **automated testing of critical flows** for a project. This makes it easier to prevent changes that may break these flows in production.
+- Better **code quality** is ensured because you can configure the 
+
+---
+
+# What are GitHub Actions?
+> “**GitHub Actions** is a continuous integration and continuous delivery (CI/CD) platform that allows you to **automate your build**, **test**, and **deployment** pipeline. 
+
+> You can create **workflows** that build and test every pull request to your repository, or deploy merged pull requests to production.”
+
+>  you can set up CI/CD pipelines that run when certain **actions are taken on a repository**. 
+
+> You can decide to **run tests for every pull request (PR)** created or merged, you can automatically deploy merged PR, and you can even set up a workflow to add the appropriate labels when a PR is created.
+
+---
+
+> In the Git repository, click on the **Actions** tab. 
+> A simple **workflow** with the minimum necessary structure is already suggested, and you have the option to set up a workflow yourself.
+
+![w:600](actions.jpeg)
+
+---
+> Click on the **Configure** button for the **Simple workflow**. 
+
+![w:800](configuration.jpeg)
+
+--- 
+
+# Workflows
+
+> a **workflow file is created** file is created: .github/workflows. 
+
+- A workflow is a configurable automated process that runs one or more jobs. 
+- You can see the workflow file created here is a **YAML file**. 
+- A workflow is defined by a YAML file in your .github/workflows
+directory and it is triggered by an event defined in the file.
+
+
+--- 
+# Events
+
+> In every workflow created, you need to specify a specific **event that triggers the workflow**:
+
+```yaml
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+```
+
+-  the workflow will be run whenever a **push** or **pull** request is made to the main branch. 
+
+---
+# Jobs
+
+> A job is a **set of steps** that a workflow should execute on the same runner.
+> Steps are executed in order in the same runner and are dependent on each other. 
+
+
+
+# Runners
+This indicates the server the job should run on. It could be Ubuntu Linux, Microsoft Windows, or macOS, or you can host your own runner that the job should run on.
+
+```yaml
+# The type of runner that the job will run on
+    runs-on: ubuntu-latest
+```
+---
+
+# Actions
+
+- An **action** performs a complex, repetitive task. 
+- Actions are really important to reduce the amount of code you need to set up a workflow. 
+- You can either write an action or use an already existing action from the **GitHub Marketplace**.
+
+> For your project you will need to use a **Node.js action** to build our Node application and a **Heroku action** to deploy our application.
+
+---
+#Start Commit
+
+1. **rename** the file to a name of your choice. (ex: **main.yml**)
+
+2. **Commit** this workflow (click on the **Start commit button**), then merge and clone our repository into our local machine.
 
 ---
 
@@ -103,7 +360,7 @@ language: node_js
 
 - Embed "Build status image" [![Build Status](https://travis-ci.org/unitn-software-engineering/EasyLib.svg?branch=master)](https://travis-ci.org/unitn-software-engineering/EasyLib) in your `readme.MD`
 
-> https://travis-ci.org/github/unitn-software-engineering/EasyLib [![Build Status](https://travis-ci.org/unitn-software-engineering/EasyLib.svg?branch=master)](https://travis-ci.org/unitn-software-engineering/EasyLib)
+
 
 ---
 
@@ -135,47 +392,6 @@ language: node_js
 
     https://devcenter.heroku.com/articles/github-integration
 
----
-
-
-## Frontend already in the same repository as your webAPIs
-
-`EasyLib\app\app.js`
-```javascript
-// Serving frontend files from process.env.FRONTEND
-app.use('/', express.static(process.env.FRONTEND || 'static'));
-// If request not handled, try in ./static
-app.use('/', express.static('static'));
-// If request not handled, try with next middlewares ...
-```
-
-`EasyLib\.env` These configurations are used only locally, never commit these settings!
-```yaml
-# Path to external frontend - If not provided, basic frontend in static/index.html is used
-FRONTEND='../EasyLibVue/dist'
-```
-
-Separately setup Heroku with appropriate environment variables!
-
----
-
-## Build and serve Vue app on *GitHubPages* pages.github.com
-
-When ready to ship app to production, run the following: `npm run build`. This generates minified html+javascript frontend in `.\dist` folder. Create a **dedicated repository for hosting** on github to host your frontend, then push your built frontend manually or with a script `EasyLibVue\deploy.sh`: 
-
-```bash
-npm run build # build Vue app
-cd dist # navigate into the build output directory
-git init
-git add -A
-git commit -m 'deploy'
-git push -f https://github.com/unitn-software-engineering/EasyLibApp.git master:gh-pages
-```
-
-***MUST be a repository dedicated to hosting, different from your Frontend repository!***
-Run `.\deploy.sh` (In case of errors, manually delete the folder `.\dist`).
-
-> https://cli.vuejs.org/guide/deployment.html#github-pages
 
 ---
 
